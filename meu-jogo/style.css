@@ -1,0 +1,121 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    background-color: #111;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+#game{
+    width: 800px;
+    height: 600px;
+    background-color: #050510;
+    border: 3px solid white;
+    position: relative;
+    overflow: hidden;
+}
+
+/*Desenhando a nave, é mais fácil usar uma imagem pronta*/
+#player{
+    width: 50px;
+    height: 60px;
+    /*background-color: dodgerblue;*/
+    position: absolute;
+    left: 375x;
+    top: 500px;
+}
+
+/*Corpo da nave*/
+#player::before{
+    content: "";
+
+    position: absolute;
+
+    width: 0;
+    height: 0;
+
+    border-left: 25px solid transparent;
+    border-right: 25px solid transparent;
+    border-bottom: 60px solid dodgerblue;
+}
+
+.cockpit{
+    position: absolute;
+
+    width: 14px;
+    height: 20px;
+
+    background-color: lightblue;
+
+    left: 18px;
+    top: 20px;
+
+    border-radius: 50%;
+}
+
+/*Asas*/
+.wing{
+    position: absolute;
+
+    width: 18px;
+    height: 30px;
+
+    background-color: royalblue;
+
+    top: 30px;
+}
+
+.left-wing{
+    left: -5px;
+
+    transform: rotate(25deg);
+}
+
+.right-wing{
+    right: -5px;
+
+    transform: rotate(-25deg);
+}
+
+/*Aparência dos tiros*/
+.tiro{
+    width: 5px;
+    height: 15px;
+
+    background-color: yellow;
+
+    position: absolute;
+}
+
+/*Aparência dos meteoros*/
+.meteoro{
+    width: 40px;
+    height: 40px;
+
+    background-color: gray;
+
+    border-radius: 50%;
+
+    position: absolute;
+}
+
+/*Pontuação*/
+#pontuacao{
+    position: absolute;
+
+    top: 10px;
+    left: 10px;
+
+    color: white;
+
+    font-size: 20px;
+    font-family: Arial, sans-serif;
+
+    z-index: 10;
+}
