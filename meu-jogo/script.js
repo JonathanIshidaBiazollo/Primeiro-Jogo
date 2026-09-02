@@ -4,6 +4,7 @@ const game = document.getElementById("game");
 const pontuacaoElemento = document.getElementById("pontuacao");
 const vidasElemento = document.getElementById("vidas");
 const gameOverElemento = document.getElementById("gameOver");
+const botaoReiniciar = document.getElementById("botaoReiniciar");
 
 //variáveis do eixo X e Y no plano cartesiano de um jogo 2D
 let playerX = 380;
@@ -160,7 +161,14 @@ function atualizarMeteoros(){
                 jogoRodando = false;
 
                 gameOverElemento.textContent = "GAME OVER";
+                gameOverElemento.style.display = "block";
+
+                botaoReiniciar.style.display = "block";
+
+                clearInterval(intervaloMeteoros);//quando o jogo terminar os meteoros param de serem criados, na tela eles não aparecem, mas internamente sim o que faz consumir memória
+                
             }
+            continue;
         }
 
         if(posicaoAtual > game.clientHeight){
@@ -171,10 +179,54 @@ function atualizarMeteoros(){
     }
 }
 
+//Reiniciar Jogo
+function reiniciarJogo(){
+    vidas = 3;
+    pontuacao = 0;
+
+    playerX = 380;
+    playerY = 500;
+
+    jogoRodando = true;
+
+    vidasElemento.textContent = "Vidas: ❤️ ❤️ ❤️";
+    pontuacaoElemento.textContent = "Pontos: 0";
+
+    gameOverElemento.style.display = "none";
+    botaoReiniciar.style.display = "none";
+
+    tiros.forEach(function(tiro){
+        tiro.remove();
+    });
+
+    meteoros.forEach(function(meteoro){
+        meteoro.remove();
+    });
+
+    tiros = [];
+    meteoros = [];
+
+    player.style.left = playerX + "px";
+    player.style.top = playerY + "px";
+
+    iniciarMeteoros();
+    loop();//se não os meteoros não aparecem de novoa
+}
+
+botaoReiniciar.addEventListener("click", function(){
+    reiniciarJogo();
+});
+
 //Criar os meteoros automaticamente
-setInterval(function(){
-    criarMeteoro();
-}, 1000);//a cada 1000ms ou 1s, novos meteoros serão criados
+let intervaloMeteoros;
+
+function iniciarMeteoros(){
+    intervaloMeteoros = setInterval(function(){
+        criarMeteoro();
+    }, 1000);//a cada 1000ms ou 1s, novos meteoros serão criados
+}
+
+iniciarMeteoros();
 
 //verifico se o tiro e o meteoro estão se sobrepondo
 function verificarColisao(tiro, meteoro){
