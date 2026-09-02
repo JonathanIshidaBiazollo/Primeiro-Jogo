@@ -27,7 +27,7 @@ body{
     height: 60px;
     /*background-color: dodgerblue;*/
     position: absolute;
-    left: 375x;
+    left: 375px;
     top: 500px;
 }
 
@@ -118,4 +118,36 @@ body{
     font-family: Arial, sans-serif;
 
     z-index: 10;
+}
+
+/*Fim de jogo*/
+#gameOver{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);/*só o top e left 50% não deixa no meio, precisa do translate*/
+
+    font-size: 50px;
+    font-weight: bold;
+
+    color: white;
+
+    display: none;
+}
+
+#botaoReiniciar{
+    position: absolute;
+
+    top: 60%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    padding: 10px 20px;
+
+    font-size: 18px;
+
+    display: none;
+    
+    cursor: pointer;
 }
