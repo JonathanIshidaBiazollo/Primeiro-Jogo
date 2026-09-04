@@ -4,7 +4,20 @@ const game = document.getElementById("game");
 const pontuacaoElemento = document.getElementById("pontuacao");
 const vidasElemento = document.getElementById("vidas");
 const gameOverElemento = document.getElementById("gameOver");
+const botaoIniciar = document.getElementById("botaoIniciar");
 const botaoReiniciar = document.getElementById("botaoReiniciar");
+const dificuldadeElemento = document.getElementById("dificuldade");
+
+const somTiro = new Audio("sons/alienshoot1.wav");
+const somExplosao = new Audio("sons/explosion.wav");
+const musica = new Audio("sons/our_expanse_2_-_chill_-_with_tail.mp3");
+const somImpacto = new Audio("sons/hurt_01.mp3");
+const somGameOver = new Audio("sons/horror-go.mp3");
+
+musica.loop = true;
+musica.volume = 0.3;
+somTiro.volume = 1;
+somExplosao.volume = 1;
 
 //variáveis do eixo X e Y no plano cartesiano de um jogo 2D
 let playerX = 380;
@@ -17,7 +30,12 @@ let meteoros = [];
 
 let pontuacao = 0;
 let vidas = 3;
-let jogoRodando = true;
+let jogoRodando = false;
+
+let inicioDoJogo = Date.now();
+
+let dificuldade = 0;
+let dificuldadeAnterior = 0;
 
 const teclas = {};
 
@@ -60,6 +78,11 @@ function criarTiro(){
 
 
     tiros.push(tiro);//colocando mais um tiro no array de tiros
+
+    //somTiro.play();
+    //da maneira debaixo cosnigo fazer os sons de tiros se sobrepor a cada disparo e não ter que esperar o som anterior terminar pra um novo funcionar
+    const novoSomTiro = new Audio("sons/alienshoot1.wav");
+    novoSomTiro.play();
 }
 
 /*Movimentando os tiros*/
@@ -99,11 +122,15 @@ function atualizarTiros(){
                 meteoro.remove();
                 meteoros.splice(j, 1);
 
-                pontuacao += 10;
+                const novosomExplosao = new Audio("sons/explosion.wav");
+                novosomExplosao.play();
+
+                pontuacao += meteoro.pontos;
 
                 pontuacaoElemento.textContent = "Pontos: " + pontuacao;
 
                 acertou = true;
+                
                 break;//o break é usado pq se um tiro já atingiu um meteoro eu devo parar de fazer essa verificação
             }
         }
@@ -127,10 +154,32 @@ function criarMeteoro(){
 
     meteoro.classList.add("meteoro");
 
-    const posicaoX = Math.random() * (game.clientWidth - 40);
+    const posicaoX = Math.random() * (game.clientWidth - 60);
+
+    const tipo = Math.random();
+
+    if(tipo < 0.33){
+        //meteoro pequeno
+        meteoro.tamanho = 25;
+        meteoro.velocidade = Math.random() * 2 + 4 + dificuldade;
+        meteoro.pontos = 20;
+    }else if(tipo < 0.66){
+        //meteoro médio
+        meteoro.tamanho = 40;
+        meteoro.velocidade = Math.random() * 2 + 3 + dificuldade;
+        meteoro.pontos = 10;
+    }else{
+        //meteoro grande
+        meteoro.tamanho = 60;
+        meteoro.velocidade = Math.random() * 2 + 1 + dificuldade;
+        meteoro.pontos = 5;
+    }
+
+    meteoro.style.width = meteoro.tamanho + "px";
+    meteoro.style.height = meteoro.tamanho + "px";
 
     meteoro.style.left = posicaoX + "px";
-    meteoro.style.top = "-40px";//sempre vai sair da mesma altura, porém a largura vai ser aleatória pra não sair sempre do mesmo local
+    meteoro.style.top = "-60px";//sempre vai sair da mesma altura, porém a largura vai ser aleatória pra não sair sempre do mesmo local
 
     game.appendChild(meteoro);
 
@@ -144,12 +193,16 @@ function atualizarMeteoros(){
 
         let posicaoAtual = parseInt(meteoro.style.top);
 
-        posicaoAtual += 3;
+        //posicaoAtual += 3;//se a velocidade fosse constante
+        posicaoAtual += meteoro.velocidade;//velocidades diferentes
 
         meteoro.style.top = posicaoAtual + "px";
 
         //verificando se algum meteoro bateu na nave
         if(verificarColisao(player, meteoro)){
+            const novoSomImpacto = new Audio("sons/hurt_01.mp3");
+            novoSomImpacto.play();
+
             meteoro.remove();
             meteoros.splice(i, 1);
 
@@ -167,6 +220,8 @@ function atualizarMeteoros(){
 
                 clearInterval(intervaloMeteoros);//quando o jogo terminar os meteoros param de serem criados, na tela eles não aparecem, mas internamente sim o que faz consumir memória
                 
+                musica.pause();
+                somGameOver.play();
             }
             continue;
         }
@@ -189,8 +244,15 @@ function reiniciarJogo(){
 
     jogoRodando = true;
 
+    musica.play();
+
+    inicioDoJogo = Date.now();
+    dificuldade = 0;
+    dificuldadeAnterior = 0;
+
     vidasElemento.textContent = "Vidas: ❤️ ❤️ ❤️";
     pontuacaoElemento.textContent = "Pontos: 0";
+    dificuldadeElemento.textContent = "Pontos: 0";
 
     gameOverElemento.style.display = "none";
     botaoReiniciar.style.display = "none";
@@ -209,24 +271,51 @@ function reiniciarJogo(){
     player.style.left = playerX + "px";
     player.style.top = playerY + "px";
 
+    
     iniciarMeteoros();
     loop();//se não os meteoros não aparecem de novoa
 }
+
+function iniciarJogo(){
+    inicioDoJogo = Date.now();
+    dificuldade = 0;
+    dificuldadeAnterior = 0;
+    
+    jogoRodando = true;
+
+    musica.play();
+
+    clearInterval(intervaloMeteoros);
+
+    iniciarMeteoros();
+    loop();
+
+    botaoIniciar.style.display = "none";
+}
+
+botaoIniciar.addEventListener("click", function(){
+    iniciarJogo();
+});
 
 botaoReiniciar.addEventListener("click", function(){
     reiniciarJogo();
 });
 
 //Criar os meteoros automaticamente
+
 let intervaloMeteoros;
 
 function iniciarMeteoros(){
+    clearInterval(intervaloMeteoros);
+    //let intervalo = 1000 - (dificuldade * 100);
+    let intervalo = Math.max(200, 1000 - (dificuldade * 70));
+
     intervaloMeteoros = setInterval(function(){
         criarMeteoro();
-    }, 1000);//a cada 1000ms ou 1s, novos meteoros serão criados
+    }, intervalo);//a cada 1000ms ou 1s, novos meteoros serão criados
 }
 
-iniciarMeteoros();
+//iniciarMeteoros();
 
 //verifico se o tiro e o meteoro estão se sobrepondo
 function verificarColisao(tiro, meteoro){
@@ -244,6 +333,24 @@ function verificarColisao(tiro, meteoro){
 }
 
 function atualizar(){
+    const tempoDeJogo = (Date.now() - inicioDoJogo) / 1000;
+    //dificuldade = Math.floor(tempoDeJogo / 10);//aumenta a dificuldade indefinidamente a cada 10 segundos
+    dificuldade = Math.min(10, Math.floor(tempoDeJogo / 10));//Dificuldade tem um limite máximo de até o nível 10
+
+    dificuldadeElemento.textContent = "Nível: " + dificuldade;
+
+    if(dificuldade !== dificuldadeAnterior){
+        console.log("A dificuldade aumentou!");
+
+        clearInterval(intervaloMeteoros);
+
+        iniciarMeteoros();
+
+        dificuldadeAnterior = dificuldade;
+    }
+    
+
+    console.log("Tempo: ", tempoDeJogo, "Dificuldade: ", dificuldade);
     //cada vez que eu pressionar uma tecla ele adiciona a velocidade atual um novo valor
     if(teclas["ArrowLeft"]  || teclas["a"] || teclas["A"]){
         playerX -= velocidade;
