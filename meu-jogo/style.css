@@ -106,7 +106,7 @@ body{
 }
 
 /*Pontuação*/
-#pontuacao{
+#pontuacao, #vidas, #dificuldade{
     position: absolute;
 
     top: 10px;
@@ -118,6 +118,14 @@ body{
     font-family: Arial, sans-serif;
 
     z-index: 10;
+}
+
+#vidas{
+    top: 30px;
+}
+
+#dificuldade{
+    top: 55px;
 }
 
 /*Fim de jogo*/
@@ -133,6 +141,21 @@ body{
     color: white;
 
     display: none;
+}
+
+#botaoIniciar{
+    position: absolute;
+
+    top: 60%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    padding: 10px 20px;
+
+    font-size: 18px;
+    
+    cursor: pointer;
 }
 
 #botaoReiniciar{
